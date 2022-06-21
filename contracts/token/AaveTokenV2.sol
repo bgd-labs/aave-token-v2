@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.7.5;
+pragma solidity ^0.8.0;
 
 import {ERC20} from '../open-zeppelin/ERC20.sol';
 import {ITransferHook} from '../interfaces/ITransferHook.sol';
 import {VersionedInitializable} from '../utils/VersionedInitializable.sol';
 import {GovernancePowerDelegationERC20} from './base/GovernancePowerDelegationERC20.sol';
-import {SafeMath} from '../open-zeppelin/SafeMath.sol';
 
 /**
  * @notice implementation of the AAVE token contract
  * @author Aave
  */
 contract AaveTokenV2 is GovernancePowerDelegationERC20, VersionedInitializable {
-  using SafeMath for uint256;
-
   string internal constant NAME = 'Aave Token';
   string internal constant SYMBOL = 'AAVE';
   uint8 internal constant DECIMALS = 18;
@@ -88,7 +85,7 @@ contract AaveTokenV2 is GovernancePowerDelegationERC20, VersionedInitializable {
     );
 
     require(owner == ecrecover(digest, v, r, s), 'INVALID_SIGNATURE');
-    _nonces[owner] = currentValidNonce.add(1);
+    _nonces[owner] = currentValidNonce + 1;
     _approve(owner, spender, value);
   }
 
@@ -135,7 +132,7 @@ contract AaveTokenV2 is GovernancePowerDelegationERC20, VersionedInitializable {
 
     // caching the aave governance address to avoid multiple state loads
     ITransferHook aaveGovernance = _aaveGovernance;
-    if (aaveGovernance != ITransferHook(0)) {
+    if (address(aaveGovernance) != address(0)) {
       aaveGovernance.onTransfer(from, to, amount);
     }
   }

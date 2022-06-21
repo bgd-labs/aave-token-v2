@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.7.5;
+pragma solidity ^0.8.0;
 
-import {SafeMath} from '../../open-zeppelin/SafeMath.sol';
 import {ERC20} from '../../open-zeppelin/ERC20.sol';
 import {
   IGovernancePowerDelegationToken
@@ -12,7 +11,6 @@ import {
  * @author Aave
  */
 abstract contract GovernancePowerDelegationERC20 is ERC20, IGovernancePowerDelegationToken {
-  using SafeMath for uint256;
   /// @notice The EIP-712 typehash for the delegation struct used by the contract
   bytes32 public constant DELEGATE_BY_TYPE_TYPEHASH = keccak256(
     'DelegateByType(address delegatee,uint256 type,uint256 nonce,uint256 expiry)'
@@ -171,10 +169,10 @@ abstract contract GovernancePowerDelegationERC20 is ERC20, IGovernancePowerDeleg
         snapshotsCounts,
         from,
         uint128(previous),
-        uint128(previous.sub(amount))
+        uint128(previous - amount)
       );
 
-      emit DelegatedPowerChanged(from, previous.sub(amount), delegationType);
+      emit DelegatedPowerChanged(from, previous - amount, delegationType);
     }
     if (to != address(0)) {
       uint256 previous = 0;
@@ -185,15 +183,9 @@ abstract contract GovernancePowerDelegationERC20 is ERC20, IGovernancePowerDeleg
         previous = balanceOf(to);
       }
 
-      _writeSnapshot(
-        snapshots,
-        snapshotsCounts,
-        to,
-        uint128(previous),
-        uint128(previous.add(amount))
-      );
+      _writeSnapshot(snapshots, snapshotsCounts, to, uint128(previous), uint128(previous + amount));
 
-      emit DelegatedPowerChanged(to, previous.add(amount), delegationType);
+      emit DelegatedPowerChanged(to, previous + amount, delegationType);
     }
   }
 

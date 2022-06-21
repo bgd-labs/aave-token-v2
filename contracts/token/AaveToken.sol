@@ -1,18 +1,15 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.7.5;
+pragma solidity ^0.8.0;
 
 import {ERC20} from '../open-zeppelin/ERC20.sol';
 import {ITransferHook} from '../interfaces/ITransferHook.sol';
 import {VersionedInitializable} from '../utils/VersionedInitializable.sol';
-import {SafeMath} from '../open-zeppelin/SafeMath.sol';
 
 /**
  * @notice implementation of the AAVE token contract
  * @author Aave
  */
 contract AaveToken is ERC20, VersionedInitializable {
-  using SafeMath for uint256;
-
   /// @dev snapshot of a value on a specific block, used for balances
   struct Snapshot {
     uint128 blockNumber;
@@ -123,7 +120,7 @@ contract AaveToken is ERC20, VersionedInitializable {
     );
 
     require(owner == ecrecover(digest, v, r, s), 'INVALID_SIGNATURE');
-    _nonces[owner] = currentValidNonce.add(1);
+    _nonces[owner] = currentValidNonce + 1;
     _approve(owner, spender, value);
   }
 
@@ -184,16 +181,16 @@ contract AaveToken is ERC20, VersionedInitializable {
 
     if (from != address(0)) {
       uint256 fromBalance = balanceOf(from);
-      _writeSnapshot(from, uint128(fromBalance), uint128(fromBalance.sub(amount)));
+      _writeSnapshot(from, uint128(fromBalance), uint128(fromBalance - amount));
     }
     if (to != address(0)) {
       uint256 toBalance = balanceOf(to);
-      _writeSnapshot(to, uint128(toBalance), uint128(toBalance.add(amount)));
+      _writeSnapshot(to, uint128(toBalance), uint128(toBalance + amount));
     }
 
     // caching the aave governance address to avoid multiple state loads
     ITransferHook aaveGovernance = _aaveGovernance;
-    if (aaveGovernance != ITransferHook(0)) {
+    if (address(aaveGovernance) != address(0)) {
       aaveGovernance.onTransfer(from, to, amount);
     }
   }

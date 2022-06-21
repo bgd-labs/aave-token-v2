@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.7.5;
+pragma solidity ^0.8.0;
 
 interface IGovernancePowerDelegationToken {
-  
   enum DelegationType {VOTING_POWER, PROPOSITION_POWER}
 
   /**
@@ -31,11 +30,13 @@ interface IGovernancePowerDelegationToken {
    * @param delegationType the type of delegation (VOTING_POWER, PROPOSITION_POWER)
    **/
   function delegateByType(address delegatee, DelegationType delegationType) external virtual;
+
   /**
    * @dev delegates all the powers to a specific user
    * @param delegatee the user to which the power will be delegated
    **/
   function delegate(address delegatee) external virtual;
+
   /**
    * @dev returns the delegatee of an user
    * @param delegator the address of the delegator
@@ -66,9 +67,9 @@ interface IGovernancePowerDelegationToken {
     uint256 blockNumber,
     DelegationType delegationType
   ) external virtual view returns (uint256);
- 
+
   /**
-  * @dev returns the total supply at a certain block number
-  **/
+   * @dev returns the total supply at a certain block number
+   **/
   function totalSupplyAt(uint256 blockNumber) external virtual view returns (uint256);
 }

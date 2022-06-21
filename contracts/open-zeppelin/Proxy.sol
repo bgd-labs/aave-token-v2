@@ -1,4 +1,4 @@
-pragma solidity ^0.7.5;
+pragma solidity ^0.8.0;
 
 /**
  * @title Proxy
@@ -12,7 +12,7 @@ abstract contract Proxy {
    * @dev Fallback function.
    * Implemented entirely in `_fallback`.
    */
-  fallback () payable external {
+  fallback() external payable {
     _fallback();
   }
 
@@ -42,9 +42,13 @@ abstract contract Proxy {
       returndatacopy(0, 0, returndatasize())
 
       switch result
-      // delegatecall returns 0 on error.
-      case 0 { revert(0, returndatasize()) }
-      default { return(0, returndatasize()) }
+        // delegatecall returns 0 on error.
+        case 0 {
+          revert(0, returndatasize())
+        }
+        default {
+          return(0, returndatasize())
+        }
     }
   }
 
@@ -53,8 +57,7 @@ abstract contract Proxy {
    * Can be redefined in derived contracts to add functionality.
    * Redefinitions must call super._willFallback().
    */
-  function _willFallback() internal virtual {
-  }
+  function _willFallback() internal virtual {}
 
   /**
    * @dev fallback implementation.
